@@ -3,38 +3,117 @@
     {
         "node": 1,
         "phases": [
-            {"phase": 1, "colour": "Red", "seconds": 10},
-            {"phase": 2, "colour": "Green", "seconds": 5},
-            {"phase": 3, "colour": "Red", "seconds": 5},
-            {"phase": 2, "colour": "Green", "seconds": 5}
+            {
+            "phase1": [
+            {
+                "colour": "Red", "seconds": 10
+            }
+            ]},
+            {
+            "phase2": [
+            {
+                "colour": "Green", "seconds": 5
+            }
+            ]},
+            {
+            "phase3": [
+            {
+                "colour": "Red", "seconds": 5
+            }
+            ]},
+            {
+            "phase4": [
+            {
+                "colour": "Green", "seconds": 5
+            }
+            ]}
         ]
     },
     {
         "node": 2,
         "phases": [
-            {"phase": 1, "colour": "Red", "seconds": 10},
-            {"phase": 2, "colour": "Green", "seconds": 5},
-            {"phase": 3, "colour": "Red", "seconds": 5},
-            {"phase": 2, "colour": "Green", "seconds": 5}
+            {
+            "phase1": [
+            {
+                "colour": "Red", "seconds": 10
+            }
+            ]},
+            {
+            "phase2": [
+            {
+                "colour": "Green", "seconds": 5
+            }
+            ]},
+            {
+            "phase3": [
+            {
+                "colour": "Red", "seconds": 5
+            }
+            ]},
+            {
+            "phase4": [
+            {
+                "colour": "Green", "seconds": 5
+            }
+            ]}
         ]
     },
     {
         "node": 3,
         "phases": [
-            {"phase": 1, "colour": "Green", "seconds": 5},
-            {"phase": 2, "colour": "Red", "seconds": 5},
-            {"phase": 3, "colour": "Green", "seconds": 10},
-            {"phase": 2, "colour": "Red", "seconds": 5}
+            {
+            "phase1": [
+            {
+                "colour": "Green", "seconds": 5
+            }
+            ]},
+            {
+            "phase2": [
+            {
+                "colour": "Red", "seconds": 5
+            }
+            ]},
+            {
+            "phase3": [
+            {
+                "colour": "Green", "seconds": 10
+            }
+            ]},
+            {
+            "phase4": [
+            {
+                "colour": "Red", "seconds": 5
+            }
+            ]}
         ]
     },
     {
         "node": 4,
         "phases": [
-            {"phase": 1, "colour": "Green", "seconds": 5},
-            {"phase": 2, "colour": "Red", "seconds": 5},
-            {"phase": 3, "colour": "Green", "seconds": 10},
-            {"phase": 2, "colour": "Red", "seconds": 5}
+            {
+            "phase1": [
+            {
+                "colour": "Green", "seconds": 5
+            }
+            ]},
+            {
+            "phase2": [
+            {
+                "colour": "Red", "seconds": 5
+            }
+            ]},
+            {
+            "phase3": [
+            {
+                "colour": "Green", "seconds": 10
+            }
+            ]},
+            {
+            "phase4": [
+            {
+                "colour": "Red", "seconds": 5
+            }
+            ]}
         ]
-    }
-    ]
+    }]
 } 
