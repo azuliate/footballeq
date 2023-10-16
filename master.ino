@@ -12,10 +12,37 @@
 const char* ssid = "FOOTBALLEYEQ";
 const char* password = "password";
 
+String title;
+String desc;
+int exerciseNum = 0;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
+void evaluateExercise(){
+  switch(exerciseNum){
+    case 0:
+      title = "";
+      desc = "";
+      break;
+    case 1:
+      title = "Exercise 1";
+      desc = "Exercise 1 Description =D";
+    default:
+      break;
+  }
+}
+
+String processor(const String& var){
+  evaluateExercise();
+  if(var == "TITLE"){
+    return title;
+  }
+  if(var == "DESC"){
+    return desc;
+  }
+  return String();
+}
  
 void setup(){
   // Serial port for debugging purposes
@@ -52,6 +79,10 @@ void setup(){
   // Route to load style.css file
   server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/style.css", "text/css");
+  });
+
+  server.on("/connect.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/connect.html", String(), false, processor);
   });
 
   // Start server
