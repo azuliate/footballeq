@@ -5,7 +5,9 @@
 #include <esp_now.h>
 #include <ArduinoJson.h>
 
+//Struct for data to be sent
 typedef struct FeqData{
+  boolean running;
   int node;
   char phase1_colour[2];
   int phase1_seconds;
@@ -17,12 +19,17 @@ typedef struct FeqData{
   int phase4_seconds;
 } FeqData;
 
+//Instance of struct for each node
 FeqData dataNode1;
+FeqData dataNode2;
+FeqData dataNode3;
+FeqData dataNode4;
 
-// Replace with your network credentials
+// Wifi network credentials
 const char* ssid = "FOOTBALLEYEQ";
 const char* password = "password";
 
+//Initalizing variables
 String title;
 String desc;
 int exerciseNum;
@@ -33,8 +40,12 @@ AsyncWebServer server(80);
 
 esp_now_peer_info_t peerInfo;
 
+//Storing node mac addresses
 uint8_t node1[] = {0x34, 0x85, 0x18, 0x75, 0xE1, 0x24};
+uint8_t node2[] = {0x34, 0x85, 0x18, 0x8D, 0x74, 0xB8};
+uint8_t node3[] = {0x34, 0x85, 0x18, 0x96, 0xEF, 0x10};
 
+//Logging if data has been sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
     char macStr[18];
   Serial.print("Packet to: ");
@@ -46,7 +57,9 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
 
+//Setting exercise
 void evaluateExercise(){
+  //Place holder exercises and descriptions
   switch(exerciseNum){
     case 0:
       title = "";
@@ -78,8 +91,11 @@ void evaluateExercise(){
 }
 
 void parseExercise(){
+  //Opening the first exercise
   if(exerciseNum == 1){
+    //Get the file
     File exerciseFile = SPIFFS.open("/exercises/exercise1.json", "r");
+      
       if(!exerciseFile){
         Serial.println("Failed to open config file");
         return;
@@ -90,10 +106,13 @@ void parseExercise(){
       //Allocate buffer to store json contents
       std::unique_ptr<char[]> buf(new char[size]);
 
+      //Reading in the file
       exerciseFile.readBytes(buf.get(), size);
 
       const size_t capacity = 16*JSON_ARRAY_SIZE(1) + 5*JSON_ARRAY_SIZE(4) + 17*JSON_OBJECT_SIZE(1) + 20*JSON_OBJECT_SIZE(2) + 590;
       DynamicJsonBuffer jsonBuffer(capacity);
+
+      //Parsing the JSON
       JsonObject& json = jsonBuffer.parseObject(buf.get());
 
       if(!json.success()){
@@ -101,9 +120,9 @@ void parseExercise(){
         return;
       }
 
-      dataNode1.node = json["nodes"][0]["node"]; // 1
 
-  
+      //Setting the data for the first node
+      dataNode1.node = json["nodes"][0]["node"]; // 1
 
       const char* node1_phase1_colour = json["nodes"][0]["phases"][0]["phase1"][0]["colour"];
       dataNode1.phase1_colour[0] = node1_phase1_colour[0];
@@ -128,62 +147,97 @@ void parseExercise(){
       dataNode1.phase4_colour[1] = '\0';
       int node1_phase4_seconds = json["nodes"][0]["phases"][3]["phase4"][0]["seconds"];
       dataNode1.phase4_seconds = node1_phase4_seconds;
+
+
+      //Setting the data for the second node
+      dataNode2.node = json["nodes"][1]["node"]; // 1
+
+      const char* node2_phase1_colour = json["nodes"][1]["phases"][0]["phase1"][0]["colour"];
+      dataNode2.phase1_colour[0] = node2_phase1_colour[0];
+      dataNode2.phase1_colour[1] = '\0';
+      int node2_phase1_seconds = json["nodes"][1]["phases"][0]["phase1"][0]["seconds"];
+      dataNode2.phase1_seconds = node2_phase1_seconds;
+
+      const char* node2_phase2_colour = json["nodes"][1]["phases"][1]["phase2"][0]["colour"];
+      dataNode2.phase2_colour[0] = node2_phase2_colour[0];
+      dataNode2.phase2_colour[1] = '\0';
+      int node2_phase2_seconds = json["nodes"][1]["phases"][1]["phase2"][0]["seconds"];
+      dataNode21.phase2_seconds = node2_phase2_seconds;
+
+      const char* node2_phase3_colour = json["nodes"][1]["phases"][2]["phase3"][0]["colour"];
+      dataNode2.phase3_colour[0] = node2_phase3_colour[0];
+      dataNode2.phase3_colour[1] = '\0';
+      int node2_phase3_seconds = json["nodes"][1]["phases"][2]["phase3"][0]["seconds"];
+      dataNode2.phase3_seconds = node2_phase3_seconds;
+
+      const char* node2_phase4_colour = json["nodes"][1]["phases"][3]["phase4"][0]["colour"];
+      dataNode2.phase4_colour[0] = node2_phase4_colour[0];
+      dataNode2.phase4_colour[1] = '\0';
+      int node2_phase4_seconds = json["nodes"][1]["phases"][3]["phase4"][0]["seconds"];
+      dataNode2.phase4_seconds = node2_phase4_seconds;
+
+      //Setting the data for the third node
+      dataNode3.node = json["nodes"][2]["node"]; // 1
+
+      const char* node3_phase1_colour = json["nodes"][2]["phases"][0]["phase1"][0]["colour"];
+      dataNode3.phase1_colour[0] = node3_phase1_colour[0];
+      dataNode3.phase1_colour[1] = '\0';
+      int node3_phase1_seconds = json["nodes"][2]["phases"][0]["phase1"][0]["seconds"];
+      dataNode3.phase1_seconds = node3_phase1_seconds;
+
+      const char* node3_phase2_colour = json["nodes"][2]["phases"][1]["phase2"][0]["colour"];
+      dataNode3.phase2_colour[0] = node3_phase2_colour[0];
+      dataNode3.phase2_colour[1] = '\0';
+      int node3_phase2_seconds = json["nodes"][2]["phases"][1]["phase2"][0]["seconds"];
+      dataNode3.phase2_seconds = node3_phase2_seconds;
+
+      const char* node3_phase3_colour = json["nodes"][2]["phases"][2]["phase3"][0]["colour"];
+      dataNode3.phase3_colour[0] = node3_phase3_colour[0];
+      dataNode3.phase3_colour[1] = '\0';
+      int node3_phase3_seconds = json["nodes"][2]["phases"][2]["phase3"][0]["seconds"];
+      dataNode3.phase3_seconds = node3_phase3_seconds;
+
+      const char* node3_phase4_colour = json["nodes"][2]["phases"][3]["phase4"][0]["colour"];
+      dataNode3.phase4_colour[0] = node3_phase4_colour[0];
+      dataNode3.phase4_colour[1] = '\0';
+      int node3_phase4_seconds = json["nodes"][2]["phases"][3]["phase4"][0]["seconds"];
+      dataNode3.phase4_seconds = node3_phase4_seconds;
+
+      //Setting own data
+      dataNode4.node = json["nodes"][3]["node"]; // 1
+
+      const char* node4_phase1_colour = json["nodes"][3]["phases"][0]["phase1"][0]["colour"];
+      dataNode4.phase1_colour[0] = node4_phase1_colour[0];
+      dataNode4.phase1_colour[1] = '\0';
+      int node4_phase1_seconds = json["nodes"][3]["phases"][0]["phase1"][0]["seconds"];
+      dataNode4.phase1_seconds = node4_phase1_seconds;
+
+      const char* node4_phase2_colour = json["nodes"][3]["phases"][1]["phase2"][0]["colour"];
+      dataNode4.phase2_colour[0] = node4_phase2_colour[0];
+      dataNode4.phase2_colour[1] = '\0';
+      int node4_phase2_seconds = json["nodes"][3]["phases"][1]["phase2"][0]["seconds"];
+      dataNode4.phase2_seconds = node4_phase2_seconds;
+
+      const char* node4_phase3_colour = json["nodes"][3]["phases"][2]["phase3"][0]["colour"];
+      dataNode4.phase3_colour[0] = node4_phase3_colour[0];
+      dataNode4.phase3_colour[1] = '\0';
+      int node4_phase3_seconds = json["nodes"][3]["phases"][2]["phase3"][0]["seconds"];
+      dataNode4.phase3_seconds = node4_phase3_seconds;
+
+      const char* node4_phase4_colour = json["nodes"][3]["phases"][3]["phase4"][0]["colour"];
+      dataNode4.phase4_colour[0] = node4_phase4_colour[0];
+      dataNode4.phase4_colour[1] = '\0';
+      int node4_phase4_seconds = json["nodes"][3]["phases"][3]["phase4"][0]["seconds"];
+      dataNode4.phase4_seconds = node4_phase4_seconds;
+      
       exerciseFile.close();
       return;
       } else{
         Serial.println("No exercise selected.");
       }
 }
-  
 
-  /*int nodes_1_node = nodes[1]["node"]; // 2
-
-  JsonArray& nodes_1_phases = nodes[1]["phases"];
-
-  const char* nodes_1_phases_0_phase1_0_colour = nodes_1_phases[0]["phase1"][0]["colour"]; // "Red"
-  int nodes_1_phases_0_phase1_0_seconds = nodes_1_phases[0]["phase1"][0]["seconds"]; // 10
-
-  const char* nodes_1_phases_1_phase2_0_colour = nodes_1_phases[1]["phase2"][0]["colour"]; // "Green"
-  int nodes_1_phases_1_phase2_0_seconds = nodes_1_phases[1]["phase2"][0]["seconds"]; // 5
-
-  const char* nodes_1_phases_2_phase3_0_colour = nodes_1_phases[2]["phase3"][0]["colour"]; // "Red"
-  int nodes_1_phases_2_phase3_0_seconds = nodes_1_phases[2]["phase3"][0]["seconds"]; // 5
-
-  const char* nodes_1_phases_3_phase4_0_colour = nodes_1_phases[3]["phase4"][0]["colour"]; // "Green"
-  int nodes_1_phases_3_phase4_0_seconds = nodes_1_phases[3]["phase4"][0]["seconds"]; // 5
-
-  int nodes_2_node = nodes[2]["node"]; // 3
-
-  JsonArray& nodes_2_phases = nodes[2]["phases"];
-
-  const char* nodes_2_phases_0_phase1_0_colour = nodes_2_phases[0]["phase1"][0]["colour"]; // "Green"
-  int nodes_2_phases_0_phase1_0_seconds = nodes_2_phases[0]["phase1"][0]["seconds"]; // 5
-
-  const char* nodes_2_phases_1_phase2_0_colour = nodes_2_phases[1]["phase2"][0]["colour"]; // "Red"
-  int nodes_2_phases_1_phase2_0_seconds = nodes_2_phases[1]["phase2"][0]["seconds"]; // 5
-
-  const char* nodes_2_phases_2_phase3_0_colour = nodes_2_phases[2]["phase3"][0]["colour"]; // "Green"
-  int nodes_2_phases_2_phase3_0_seconds = nodes_2_phases[2]["phase3"][0]["seconds"]; // 10
-
-  const char* nodes_2_phases_3_phase4_0_colour = nodes_2_phases[3]["phase4"][0]["colour"]; // "Red"
-  int nodes_2_phases_3_phase4_0_seconds = nodes_2_phases[3]["phase4"][0]["seconds"]; // 5
-
-  int nodes_3_node = nodes[3]["node"]; // 4
-
-  JsonArray& nodes_3_phases = nodes[3]["phases"];
-
-  const char* nodes_3_phases_0_phase1_0_colour = nodes_3_phases[0]["phase1"][0]["colour"]; // "Green"
-  int nodes_3_phases_0_phase1_0_seconds = nodes_3_phases[0]["phase1"][0]["seconds"]; // 5
-
-  const char* nodes_3_phases_1_phase2_0_colour = nodes_3_phases[1]["phase2"][0]["colour"]; // "Red"
-  int nodes_3_phases_1_phase2_0_seconds = nodes_3_phases[1]["phase2"][0]["seconds"]; // 5
-
-  const char* nodes_3_phases_2_phase3_0_colour = nodes_3_phases[2]["phase3"][0]["colour"]; // "Green"
-  int nodes_3_phases_2_phase3_0_seconds = nodes_3_phases[2]["phase3"][0]["seconds"]; // 10
-
-  const char* nodes_3_phases_3_phase4_0_colour = nodes_3_phases[3]["phase4"][0]["colour"]; // "Red"
-  int nodes_3_phases_3_phase4_0_seconds = nodes_3_phases[3]["phase4"][0]["seconds"]; // 5 */
-
+//Method for replacing placeholder strings on the website
 String processor(const String& var){
   evaluateExercise();
   if(var == "TITLE"){
@@ -268,15 +322,15 @@ void setup(){
     Serial.println("Failed to add peer 1");
   }
   // register second peer  
-  /*memcpy(peerInfo.peer_addr, node2, 6);
+  memcpy(peerInfo.peer_addr, node2, 6);
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer 2");
-  }/*
+  }
   /// register third peer
-  /*memcpy(peerInfo.peer_addr, node3, 6);
+  memcpy(peerInfo.peer_addr, node3, 6);
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer 3");
-  }*/
+  }
   
 
   //set wifi mode
@@ -296,40 +350,50 @@ void setup(){
     request->send(SPIFFS, "/webserver/style.css", "text/css");
   });
 
+  // Route for connect screen
   server.on("/connect.html", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/webserver/connect.html", String(), false, processor);
   });
 
+  //Route for exercise one selected
   server.on("/one", HTTP_GET, [](AsyncWebServerRequest *request){
     exerciseNum = 1;
     parseExercise();
     request->send(SPIFFS, "/webserver/connect.html", String(), false, processor);
   });
 
+  //Route for exercise two selected
   server.on("/two", HTTP_GET, [](AsyncWebServerRequest *request){
     exerciseNum = 2;
     request->send(SPIFFS, "/webserver/connect.html", String(), false, processor);
   });
 
+  //Route for exercise three selected
   server.on("/three", HTTP_GET, [](AsyncWebServerRequest *request){
     exerciseNum = 3;
     request->send(SPIFFS, "/webserver/connect.html", String(), false, processor);
   });
 
+  //Route for exercise four selected
   server.on("/four", HTTP_GET, [](AsyncWebServerRequest *request){
     exerciseNum = 4;
     request->send(SPIFFS, "/webserver/connect.html", String(), false, processor);
   });
 
+  //Route for exercise five selected
   server.on("/five", HTTP_GET, [](AsyncWebServerRequest *request){
     exerciseNum = 5;
     request->send(SPIFFS, "/webserver/connect.html", String(), false, processor);
   });
 
+  //Route for start button
   server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
+    //Sending the data
     esp_err_t result = esp_now_send(node1, (uint8_t *) &dataNode1, sizeof(FeqData));
-      if (result == ESP_OK) {
-        Serial.println("Sent with success");
+    esp_err_t result1 = esp_now_send(node2, (uint8_t *) &dataNode2, sizeof(FeqData));
+    esp_err_t result2 = esp_now_send(node3, (uint8_t *) &dataNode3, sizeof(FeqData));
+      if (result == ESP_OK && result1 == ESP_OK && result2 == ESP_OK) {
+        Serial.println("All data sent");
       }
       else {
         Serial.println("Error sending the data");

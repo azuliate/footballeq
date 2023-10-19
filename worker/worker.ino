@@ -1,7 +1,9 @@
-#include <esp_now.h>
+ #include <esp_now.h>
 #include <WiFi.h>
 
-typedef struct exercise {
+//Same struct as master
+typedef struct FeqData{
+  boolean running;
   int node;
   char phase1_colour[2];
   int phase1_seconds;
@@ -11,15 +13,17 @@ typedef struct exercise {
   int phase3_seconds;
   char phase4_colour[2];
   int phase4_seconds;
-} exercise;
-
+} FeqData;
 
 exercise myData;
 
+//When the data is recieved
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&myData, incomingData, sizeof(myData));
   Serial.print("Bytes received: ");
   Serial.println(len);
+
+  //Print all data to serial monitor
   Serial.print("nodeNum: ");
   Serial.println(myData.node);
 
